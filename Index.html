@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>P2L Portal</title>
+    <script src="https://res.cdn.office.net/teams-js/2.19.0/js/MicrosoftTeams.min.js"></script>
+    <style>
+        :root { --primary-purple: #4B53BC; --secondary-purple: #353B8E; --bg-color: #F3F5F9; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-color); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
+        .card { background: white; width: 500px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); overflow: hidden; text-align: center; }
+        .header { background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 100%); color: white; padding: 40px 20px; }
+        .header h1 { margin: 0; font-size: 24px; }
+        .login-pill { background: rgba(255, 255, 255, 0.15); border-radius: 50px; padding: 6px 16px; display: inline-flex; align-items: center; margin-top: 20px; font-size: 12px; }
+        .dot { height: 8px; width: 8px; background: #4ADE80; border-radius: 50%; margin-right: 8px; }
+        .body-content { padding: 40px 30px; }
+        .btn-main { background: var(--primary-purple); color: white; border: none; padding: 14px 45px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+        .btn-main:hover { transform: translateY(-2px); background: var(--secondary-purple); }
+        .mood-grid { display: flex; justify-content: center; gap: 10px; margin: 20px 0; }
+        .mood-btn { background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 10px; width: 45px; height: 45px; cursor: pointer; font-size: 20px; transition: 0.2s; }
+        .mood-btn.active { border-color: var(--primary-purple); background: #EEF2FF; transform: scale(1.1); }
+        .footer-message { font-size: 14px; color: var(--primary-purple); font-weight: 600; min-height: 20px; margin-top: 15px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="header">
+            <h1 id="user-greeting">Good to see you!</h1>
+            <p>Ready to level up today?</p>
+            <div class="login-pill">
+                <span class="dot"></span>
+                Last login: <span id="current-time"></span>
+            </div>
+        </div>
+        <div class="body-content">
+            <h3>Your courses are waiting for you</h3>
+            <p style="color: #6B7280; font-size: 14px;">Pick up where you left off — one click and you're back in the zone.</p>
+            <button class="btn-main" onclick="window.open('https://prooffice.plan2learn.dk/?id=1ef2679d-ff86-4c0f-abab-ee2e0ce35655', '_blank')">
+                Jump into Plan2Learn
+            </button>
+            <div style="margin-top:30px; border-top:1px solid #eee; padding-top:20px;">
+                <span style="font-size:12px; color:#9CA3AF;">How are you feeling today?</span>
+                <div class="mood-grid">
+                    <button class="mood-btn" onclick="setMood(this, 'rocket')">🚀</button>
+                    <button class="mood-btn" onclick="setMood(this, 'happy')">😊</button>
+                    <button class="mood-btn" onclick="setMood(this, 'neutral')">😐</button>
+                    <button class="mood-btn active" onclick="setMood(this, 'sleepy')">😴</button>
+                </div>
+                <div id="status-text" class="footer-message">Coffee first, then Plan2Learn 😂</div>
+            </div>
+        </div>
+    </div>
+    <script>
+        const messages = {
+            rocket: "Full speed ahead! Let's crush those courses! 🚀",
+            happy: "Great vibes! Perfect day for some learning. 😊",
+            neutral: "Let's turn that 'meh' into 'mastery' today. 😐",
+            sleepy: "Coffee first, then Plan2Learn 😂"
+        };
+
+        function setMood(btn, moodKey) {
+            document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('status-text').innerText = messages[moodKey];
+        }
+
+        // Teams Identity Logic
+        microsoftTeams.app.initialize().then(() => {
+            microsoftTeams.app.getContext().then((context) => {
+                const name = context.user.displayName || "there";
+                document.getElementById('user-greeting').innerText = "Good to see you, " + name + "!";
+            });
+        });
+
+        const now = new Date();
+        document.getElementById('current-time').innerText = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }) + ' at ' + now.getHours() + ':' + (now.getMinutes()<10?'0':'') + now.getMinutes();
+    </script>
+</body>
+</html>
