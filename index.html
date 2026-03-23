@@ -64,13 +64,49 @@
             document.getElementById('status-text').innerText = messages[moodKey];
         }
 
-        // Teams Identity Logic
+    <script>
+    const messages = {
+        rocket: "Full speed ahead! Let's crush those courses! 🚀",
+        happy: "Great vibes! Perfect day for some learning. 😊",
+        neutral: "Let's turn that 'meh' into 'mastery' today. 😐",
+        sleepy: "Coffee first, then Plan2Learn 😂"
+    };
+
+    function setMood(btn, moodKey) {
+        document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('status-text').innerText = messages[moodKey];
+    }
+
+    // --- ENHANCED TEAMS LOGIC ---
+    function loadTeamsName() {
         microsoftTeams.app.initialize().then(() => {
-            microsoftTeams.app.getContext().then((context) => {
-                const name = context.user.displayName || "there";
-                document.getElementById('user-greeting').innerText = "Good to see you, " + name + "!";
-            });
+            // Adding a tiny delay ensures the 'handshake' is stable
+            setTimeout(() => {
+                microsoftTeams.app.getContext().then((context) => {
+                    // Teams 2.x uses 'user.displayName'
+                    // Older versions used 'upn' or 'loginHint'
+                    const name = context.user.displayName || 
+                                 context.user.userPrincipalName.split('@')[0] || 
+                                 "there";
+                    
+                    document.getElementById('user-greeting').innerText = "Good to see you, " + name + "!";
+                }).catch((err) => {
+                    console.error("Context error:", err);
+                    document.getElementById('user-greeting').innerText = "Good to see you!";
+                });
+            }, 100); 
         });
+    }
+
+    // Initialize
+    if (window.parent !== window.self) {
+        loadTeamsName();
+    }
+
+    const now = new Date();
+    document.getElementById('current-time').innerText = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }) + ' at ' + now.getHours() + ':' + (now.getMinutes()<10?'0':'') + now.getMinutes();
+</script>
 
         const now = new Date();
         document.getElementById('current-time').innerText = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }) + ' at ' + now.getHours() + ':' + (now.getMinutes()<10?'0':'') + now.getMinutes();
