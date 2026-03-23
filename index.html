@@ -33,7 +33,7 @@
             </div>
         </div>
         <div class="body-content">
-            <h3>Your courses are waiting for you</h3>
+            <h3>Your courses are waiting for you (Updated!)</h3>
             <p style="color: #6B7280; font-size: 14px;">Pick up where you left off — one click and you're back in the zone.</p>
             <button class="btn-main" onclick="window.open('https://prooffice.plan2learn.dk/?id=1ef2679d-ff86-4c0f-abab-ee2e0ce35655', '_blank')">
                 Jump into Plan2Learn
@@ -50,6 +50,7 @@
             </div>
         </div>
     </div>
+
     <script>
         const messages = {
             rocket: "Full speed ahead! Let's crush those courses! 🚀",
@@ -64,52 +65,36 @@
             document.getElementById('status-text').innerText = messages[moodKey];
         }
 
-    <script>
-    const messages = {
-        rocket: "Full speed ahead! Let's crush those courses! 🚀",
-        happy: "Great vibes! Perfect day for some learning. 😊",
-        neutral: "Let's turn that 'meh' into 'mastery' today. 😐",
-        sleepy: "Coffee first, then Plan2Learn 😂"
-    };
-
-    function setMood(btn, moodKey) {
-        document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById('status-text').innerText = messages[moodKey];
-    }
-
-    // --- ENHANCED TEAMS LOGIC ---
-    function loadTeamsName() {
-        microsoftTeams.app.initialize().then(() => {
-            // Adding a tiny delay ensures the 'handshake' is stable
-            setTimeout(() => {
-                microsoftTeams.app.getContext().then((context) => {
-                    // Teams 2.x uses 'user.displayName'
-                    // Older versions used 'upn' or 'loginHint'
-                    const name = context.user.displayName || 
-                                 context.user.userPrincipalName.split('@')[0] || 
-                                 "there";
+        // --- ENHANCED TEAMS IDENTITY LOGIC ---
+        async function initializeApp() {
+            try {
+                await microsoftTeams.app.initialize();
+                
+                // Tiny delay helps ensure the Teams context is fully populated
+                setTimeout(async () => {
+                    const context = await microsoftTeams.app.getContext();
                     
-                    document.getElementById('user-greeting').innerText = "Good to see you, " + name + "!";
-                }).catch((err) => {
-                    console.error("Context error:", err);
-                    document.getElementById('user-greeting').innerText = "Good to see you!";
-                });
-            }, 100); 
-        });
-    }
+                    // Fallback chain: Display Name -> UPN username -> Default
+                    const userName = context.user.displayName || 
+                                     (context.user.userPrincipalName ? context.user.userPrincipalName.split('@')[0] : null) || 
+                                     "there";
+                    
+                    document.getElementById('user-greeting').innerText = "Good to see you, " + userName + "!";
+                }, 150);
+            } catch (err) {
+                console.error("Teams SDK failed:", err);
+            }
+        }
 
-    // Initialize
-    if (window.parent !== window.self) {
-        loadTeamsName();
-    }
-
-    const now = new Date();
-    document.getElementById('current-time').innerText = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }) + ' at ' + now.getHours() + ':' + (now.getMinutes()<10?'0':'') + now.getMinutes();
-</script>
+        // Only run if we are inside an iframe (Teams)
+        if (window.parent !== window.self) {
+            initializeApp();
+        }
 
         const now = new Date();
-        document.getElementById('current-time').innerText = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }) + ' at ' + now.getHours() + ':' + (now.getMinutes()<10?'0':'') + now.getMinutes();
+        document.getElementById('current-time').innerText = now.toLocaleDateString('en-GB', { 
+            weekday: 'long', day: 'numeric', month: 'long' 
+        }) + ' at ' + now.getHours() + ':' + (now.getMinutes()<10?'0':'') + now.getMinutes();
     </script>
 </body>
 </html>
