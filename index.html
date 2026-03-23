@@ -6,19 +6,47 @@
     <title>P2L Portal</title>
     <script src="https://res.cdn.office.net/teams-js/2.19.0/js/MicrosoftTeams.min.js"></script>
     <style>
-        :root { --primary-purple: #4B53BC; --secondary-purple: #353B8E; --bg-color: #F3F5F9; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-color); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
-        .card { background: white; width: 500px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); overflow: hidden; text-align: center; }
-        .header { background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 100%); color: white; padding: 40px 20px; }
+        :root {
+            --primary-purple: #4B53BC;
+            --secondary-purple: #353B8E;
+            --bg-color: #F3F5F9;
+            --card-bg: #FFFFFF;
+            --text-main: #242424;
+            --text-sub: #6B7280;
+            --border-color: #EEEEEE;
+            --pill-bg: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Dark Mode support */
+        body.dark {
+            --bg-color: #1F1F1F;
+            --card-bg: #292929;
+            --text-main: #FFFFFF;
+            --text-sub: #ADADAD;
+            --border-color: #3D3D3D;
+            --pill-bg: rgba(0, 0, 0, 0.3);
+        }
+
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-color); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; transition: 0.3s; }
+        .card { background: var(--card-bg); width: 500px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; text-align: center; transition: 0.3s; }
+        .header { background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 100%); color: white; padding: 40px 20px; position: relative; }
         .header h1 { margin: 0; font-size: 24px; }
-        .login-pill { background: rgba(255, 255, 255, 0.15); border-radius: 50px; padding: 6px 16px; display: inline-flex; align-items: center; margin-top: 20px; font-size: 12px; }
+        .login-pill { background: var(--pill-bg); border-radius: 50px; padding: 6px 16px; display: inline-flex; align-items: center; margin-top: 15px; font-size: 12px; }
         .dot { height: 8px; width: 8px; background: #4ADE80; border-radius: 50%; margin-right: 8px; }
-        .body-content { padding: 40px 30px; }
-        .btn-main { background: var(--primary-purple); color: white; border: none; padding: 14px 45px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; }
-        .btn-main:hover { transform: translateY(-2px); background: var(--secondary-purple); }
+        .body-content { padding: 35px 30px; color: var(--text-main); }
+        
+        .btn-main { background: var(--primary-purple); color: white; border: none; padding: 14px 45px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; width: 100%; }
+        .btn-main:hover { transform: translateY(-2px); background: var(--secondary-purple); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .btn-main:active { transform: scale(0.98); }
+
+        /* Quick Actions Grid */
+        .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .btn-sub { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); padding: 10px; border-radius: 10px; font-size: 13px; cursor: pointer; transition: 0.2s; }
+        .btn-sub:hover { background: var(--border-color); }
+
         .mood-grid { display: flex; justify-content: center; gap: 10px; margin: 20px 0; }
-        .mood-btn { background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 10px; width: 45px; height: 45px; cursor: pointer; font-size: 20px; transition: 0.2s; }
-        .mood-btn.active { border-color: var(--primary-purple); background: #EEF2FF; transform: scale(1.1); }
+        .mood-btn { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; width: 45px; height: 45px; cursor: pointer; font-size: 20px; transition: 0.2s; color: var(--text-main); }
+        .mood-btn.active { border-color: var(--primary-purple); background: rgba(75, 83, 188, 0.1); transform: scale(1.1); }
         .footer-message { font-size: 14px; color: var(--primary-purple); font-weight: 600; min-height: 20px; margin-top: 15px; }
     </style>
 </head>
@@ -27,19 +55,26 @@
         <div class="header">
             <h1 id="user-greeting">...</h1>
             <p id="sub-header">...</p>
-            <div class="login-pill">
+            <div class="login-pill" id="login-pill-box" style="display: none;">
                 <span class="dot"></span>
                 <span id="login-label"></span> <span id="current-time"></span>
             </div>
         </div>
         <div class="body-content">
             <h3 id="course-header">...</h3>
-            <p id="course-desc" style="color: #6B7280; font-size: 14px;">...</p>
-            <button class="btn-main" id="main-button" onclick="window.open('https://prooffice.plan2learn.dk/?id=1ef2679d-ff86-4c0f-abab-ee2e0ce35655', '_blank')">
+            <p id="course-desc" style="font-size: 14px; margin-bottom: 20px;">...</p>
+            
+            <button class="btn-main" id="main-button" onclick="jumpToPlan2Learn()">
                 ...
             </button>
-            <div style="margin-top:30px; border-top:1px solid #eee; padding-top:20px;">
-                <span id="mood-header" style="font-size:12px; color:#9CA3AF;">...</span>
+
+            <div class="quick-actions">
+                <button class="btn-sub" id="btn-cert" onclick="window.open('https://prooffice.plan2learn.dk/Certificates.aspx', '_blank')">📜 My Certificates</button>
+                <button class="btn-sub" id="btn-help" onclick="microsoftTeams.app.openDefaultChat({userPrincipalName: 'support@yourdomain.com', message: 'Hi, I need help with Plan2Learn'})">💬 Get Help</button>
+            </div>
+
+            <div style="margin-top:25px; border-top:1px solid var(--border-color); padding-top:20px;">
+                <span id="mood-header" style="font-size:11px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 1px;">...</span>
                 <div class="mood-grid">
                     <button class="mood-btn" onclick="setMood(this, 'rocket')">🚀</button>
                     <button class="mood-btn" onclick="setMood(this, 'happy')">😊</button>
@@ -53,6 +88,30 @@
 
     <script>
         let currentMoodMessages = {};
+        let isDanishLocale = false;
+
+        function jumpToPlan2Learn() {
+            const now = new Date();
+            localStorage.setItem('p2l_last_click', now.toISOString());
+            const btn = document.getElementById('main-button');
+            const originalText = btn.innerText;
+            btn.innerText = isDanishLocale ? "Åbner..." : "Opening...";
+            
+            setTimeout(() => {
+                window.open('https://prooffice.plan2learn.dk/?id=1ef2679d-ff86-4c0f-abab-ee2e0ce35655', '_blank');
+                btn.innerText = originalText;
+                displayLastLogin(now);
+            }, 600);
+        }
+
+        function displayLastLogin(dateObj) {
+            if (!dateObj) return;
+            document.getElementById('login-pill-box').style.display = 'inline-flex';
+            const timeString = dateObj.toLocaleDateString(isDanishLocale ? 'da-DK' : 'en-GB', { 
+                weekday: 'short', day: 'numeric', month: 'short' 
+            }) + (isDanishLocale ? ' kl. ' : ' at ') + dateObj.getHours() + ':' + (dateObj.getMinutes()<10?'0':'') + dateObj.getMinutes();
+            document.getElementById('current-time').innerText = timeString;
+        }
 
         async function initializeApp() {
             try {
@@ -60,35 +119,47 @@
                 
                 setTimeout(async () => {
                     const context = await microsoftTeams.app.getContext();
+                    isDanishLocale = (context.app.locale || "en-us").toLowerCase().includes("da");
                     
-                    // --- 1. LANGUAGE DETECTION ---
-                    const locale = context.app.locale || "en-us";
-                    const isDanish = locale.toLowerCase().includes("da");
+                    // Theme Detection
+                    if (context.app.theme === 'dark' || context.app.theme === 'contrast') {
+                        document.body.classList.add('dark');
+                    }
 
-                    // --- 2. FIRST NAME LOGIC ---
-                    const fullName = context.user.displayName || context.user.givenName || "User";
-                    const firstName = fullName.split(' ')[0]; 
+                    // Time-based Greeting
+                    const hour = new Date().getHours();
+                    let greetingBase = "";
+                    if (isDanishLocale) {
+                        if (hour < 10) greetingBase = "Godmorgen";
+                        else if (hour < 18) greetingBase = "Godt at se dig";
+                        else greetingBase = "Godaften";
+                    } else {
+                        if (hour < 12) greetingBase = "Good morning";
+                        else if (hour < 18) greetingBase = "Good afternoon";
+                        else greetingBase = "Good evening";
+                    }
 
-                    // --- 3. TRANSLATIONS ---
+                    const firstName = (context.user.displayName || "User").split(' ')[0]; 
+
                     const translations = {
-                        greeting: isDanish ? "Godt at se dig, " : "Good to see you, ",
-                        subtext: isDanish ? "Klar til at blive klogere i dag?" : "Ready to level up today?",
-                        login: isDanish ? "Sidste login: " : "Last login: ",
-                        courseHeader: isDanish ? "Dine kurser venter på dig" : "Your courses are waiting for you",
-                        courseDesc: isDanish ? "Fortsæt hvor du slap — ét klik og du er i gang igen." : "Pick up where you left off — one click and you're back in the zone.",
-                        button: isDanish ? "Gå til Plan2Learn" : "Jump into Plan2Learn",
-                        moodHeading: isDanish ? "Hvordan har du det i dag?" : "How are you feeling today?"
+                        subtext: isDanishLocale ? "Klar til at lære noget nyt?" : "Ready to learn something new?",
+                        login: isDanishLocale ? "Sidst besøgt: " : "Last visit: ",
+                        courseHeader: isDanishLocale ? "Dine kurser" : "Your Courses",
+                        courseDesc: isDanishLocale ? "Fortsæt din udvikling med ét klik." : "Continue your development with one click.",
+                        button: isDanishLocale ? "Gå til Plan2Learn" : "Jump into Plan2Learn",
+                        moodHeading: isDanishLocale ? "Hvordan er energien?" : "What's your energy level?",
+                        cert: isDanishLocale ? "📜 Mine Beviser" : "📜 My Certificates",
+                        help: isDanishLocale ? "💬 Få Hjælp" : "💬 Get Help"
                     };
 
                     currentMoodMessages = {
-                        rocket: isDanish ? "Fuld fart frem! Lad os knuse de kurser! 🚀" : "Full speed ahead! Let's crush those courses! 🚀",
-                        happy: isDanish ? "Gode vibrationer! Perfekt dag til læring. 😊" : "Great vibes! Perfect day for some learning. 😊",
-                        neutral: isDanish ? "Lad os gøre 'meh' til mesterligt i dag. 😐" : "Let's turn that 'meh' into 'mastery' today. 😐",
-                        sleepy: isDanish ? "Kaffe først, så Plan2Learn 😂" : "Coffee first, then Plan2Learn 😂"
+                        rocket: isDanishLocale ? "Fuld fart frem! 🚀" : "Full speed ahead! 🚀",
+                        happy: isDanishLocale ? "Fantastisk energi! 😊" : "Great energy! 😊",
+                        neutral: isDanishLocale ? "Vi gør det til en god dag. 😐" : "Let's make it a great day. 😐",
+                        sleepy: isDanishLocale ? "Kaffe først, så Plan2Learn! ☕" : "Coffee first, then Plan2Learn! ☕"
                     };
 
-                    // --- 4. UPDATE UI ---
-                    document.getElementById('user-greeting').innerText = translations.greeting + firstName + "!";
+                    document.getElementById('user-greeting').innerText = greetingBase + ", " + firstName + "!";
                     document.getElementById('sub-header').innerText = translations.subtext;
                     document.getElementById('login-label').innerText = translations.login;
                     document.getElementById('course-header').innerText = translations.courseHeader;
@@ -96,17 +167,14 @@
                     document.getElementById('main-button').innerText = translations.button;
                     document.getElementById('mood-header').innerText = translations.moodHeading;
                     document.getElementById('status-text').innerText = currentMoodMessages.sleepy;
+                    document.getElementById('btn-cert').innerText = translations.cert;
+                    document.getElementById('btn-help').innerText = translations.help;
 
-                    // Set dynamic time based on language
-                    const now = new Date();
-                    document.getElementById('current-time').innerText = now.toLocaleDateString(isDanish ? 'da-DK' : 'en-GB', { 
-                        weekday: 'long', day: 'numeric', month: 'long' 
-                    }) + ' kl. ' + now.getHours() + ':' + (now.getMinutes()<10?'0':'') + now.getMinutes();
+                    const savedTime = localStorage.getItem('p2l_last_click');
+                    if (savedTime) displayLastLogin(new Date(savedTime));
 
                 }, 150);
-            } catch (err) {
-                console.error("Teams SDK error:", err);
-            }
+            } catch (err) { console.error(err); }
         }
 
         function setMood(btn, moodKey) {
@@ -115,9 +183,7 @@
             document.getElementById('status-text').innerText = currentMoodMessages[moodKey];
         }
 
-        if (window.parent !== window.self) {
-            initializeApp();
-        }
+        if (window.parent !== window.self) initializeApp();
     </script>
 </body>
 </html>
