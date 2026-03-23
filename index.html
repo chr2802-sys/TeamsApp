@@ -41,7 +41,7 @@
 
         /* Quick Actions Grid */
         .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .btn-sub { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); padding: 10px; border-radius: 10px; font-size: 13px; cursor: pointer; transition: 0.2s; }
+        .btn-sub { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); padding: 10px; border-radius: 10px; font-size: 13px; cursor: pointer; transition: 0.2s; font-weight: 600; }
         .btn-sub:hover { background: var(--border-color); }
 
         .mood-grid { display: flex; justify-content: center; gap: 10px; margin: 20px 0; }
@@ -69,8 +69,8 @@
             </button>
 
             <div class="quick-actions">
-                <button class="btn-sub" id="btn-cert" onclick="window.open('https://prooffice.plan2learn.dk/Certificates.aspx', '_blank')">📜 My Certificates</button>
-                <button class="btn-sub" id="btn-help" onclick="microsoftTeams.app.openDefaultChat({userPrincipalName: 'support@yourdomain.com', message: 'Hi, I need help with Plan2Learn'})">💬 Get Help</button>
+                <button class="btn-sub" id="btn-signups" onclick="window.open('https://prooffice.plan2learn.dk/catalog/see-all/2?id=1ef2679d-ff86-4c0f-abab-ee2e0ce35655', '_blank')">📋 ...</button>
+                <button class="btn-sub" id="btn-favorites" onclick="window.open('https://prooffice.plan2learn.dk/catalog/lists/favorites?id=1ef2679d-ff86-4c0f-abab-ee2e0ce35655', '_blank')">⭐ ...</button>
             </div>
 
             <div style="margin-top:25px; border-top:1px solid var(--border-color); padding-top:20px;">
@@ -121,12 +121,10 @@
                     const context = await microsoftTeams.app.getContext();
                     isDanishLocale = (context.app.locale || "en-us").toLowerCase().includes("da");
                     
-                    // Theme Detection
                     if (context.app.theme === 'dark' || context.app.theme === 'contrast') {
                         document.body.classList.add('dark');
                     }
 
-                    // Time-based Greeting
                     const hour = new Date().getHours();
                     let greetingBase = "";
                     if (isDanishLocale) {
@@ -148,8 +146,8 @@
                         courseDesc: isDanishLocale ? "Fortsæt din udvikling med ét klik." : "Continue your development with one click.",
                         button: isDanishLocale ? "Gå til Plan2Learn" : "Jump into Plan2Learn",
                         moodHeading: isDanishLocale ? "Hvordan er energien?" : "What's your energy level?",
-                        cert: isDanishLocale ? "📜 Mine Beviser" : "📜 My Certificates",
-                        help: isDanishLocale ? "💬 Få Hjælp" : "💬 Get Help"
+                        signups: isDanishLocale ? "📋 Mine tilmeldinger" : "📋 My sign ups",
+                        favorites: isDanishLocale ? "⭐ Mine favoritter" : "⭐ My favorites"
                     };
 
                     currentMoodMessages = {
@@ -167,8 +165,8 @@
                     document.getElementById('main-button').innerText = translations.button;
                     document.getElementById('mood-header').innerText = translations.moodHeading;
                     document.getElementById('status-text').innerText = currentMoodMessages.sleepy;
-                    document.getElementById('btn-cert').innerText = translations.cert;
-                    document.getElementById('btn-help').innerText = translations.help;
+                    document.getElementById('btn-signups').innerText = translations.signups;
+                    document.getElementById('btn-favorites').innerText = translations.favorites;
 
                     const savedTime = localStorage.getItem('p2l_last_click');
                     if (savedTime) displayLastLogin(new Date(savedTime));
