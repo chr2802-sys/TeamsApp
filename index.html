@@ -7,47 +7,29 @@
     <script src="https://res.cdn.office.net/teams-js/2.19.0/js/MicrosoftTeams.min.js"></script>
     <style>
         :root {
-            --primary-purple: #4B53BC;
-            --secondary-purple: #353B8E;
-            --bg-color: #F3F5F9;
-            --card-bg: #FFFFFF;
-            --text-main: #242424;
-            --text-sub: #6B7280;
-            --border-color: #EEEEEE;
-            --pill-bg: rgba(255, 255, 255, 0.15);
+            --primary-purple: #4B53BC; --secondary-purple: #353B8E; --bg-color: #F3F5F9;
+            --card-bg: #FFFFFF; --text-main: #242424; --text-sub: #6B7280;
+            --border-color: #EEEEEE; --pill-bg: rgba(255, 255, 255, 0.15);
         }
-
-        /* Dark Mode support */
         body.dark {
-            --bg-color: #1F1F1F;
-            --card-bg: #292929;
-            --text-main: #FFFFFF;
-            --text-sub: #ADADAD;
-            --border-color: #3D3D3D;
-            --pill-bg: rgba(0, 0, 0, 0.3);
+            --bg-color: #1F1F1F; --card-bg: #292929; --text-main: #FFFFFF;
+            --text-sub: #ADADAD; --border-color: #3D3D3D; --pill-bg: rgba(0, 0, 0, 0.3);
         }
-
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-color); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; transition: 0.3s; }
-        .card { background: var(--card-bg); width: 500px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; text-align: center; transition: 0.3s; }
-        .header { background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 100%); color: white; padding: 40px 20px; position: relative; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; transition: 0.3s; }
+        .card { background: var(--card-bg); width: 500px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; text-align: center; }
+        .header { background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 100%); color: white; padding: 40px 20px; }
         .header h1 { margin: 0; font-size: 24px; }
-        .login-pill { background: var(--pill-bg); border-radius: 50px; padding: 6px 16px; display: inline-flex; align-items: center; margin-top: 15px; font-size: 12px; }
+        .login-pill { background: var(--pill-bg); border-radius: 50px; padding: 6px 16px; display: inline-flex; align-items: center; margin-top: 15px; font-size: 11px; }
         .dot { height: 8px; width: 8px; background: #4ADE80; border-radius: 50%; margin-right: 8px; }
         .body-content { padding: 35px 30px; color: var(--text-main); }
-        
         .btn-main { background: var(--primary-purple); color: white; border: none; padding: 14px 45px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; width: 100%; }
-        .btn-main:hover { transform: translateY(-2px); background: var(--secondary-purple); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        .btn-main:active { transform: scale(0.98); }
-
-        /* Quick Actions Grid */
+        .btn-main:hover { transform: translateY(-2px); background: var(--secondary-purple); }
         .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .btn-sub { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); padding: 10px; border-radius: 10px; font-size: 13px; cursor: pointer; transition: 0.2s; font-weight: 600; }
-        .btn-sub:hover { background: var(--border-color); }
-
+        .btn-sub { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); padding: 10px; border-radius: 10px; font-size: 13px; cursor: pointer; font-weight: 600; }
         .mood-grid { display: flex; justify-content: center; gap: 10px; margin: 20px 0; }
-        .mood-btn { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; width: 45px; height: 45px; cursor: pointer; font-size: 20px; transition: 0.2s; color: var(--text-main); }
+        .mood-btn { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; width: 45px; height: 45px; cursor: pointer; font-size: 20px; color: var(--text-main); }
         .mood-btn.active { border-color: var(--primary-purple); background: rgba(75, 83, 188, 0.1); transform: scale(1.1); }
-        .footer-message { font-size: 14px; color: var(--primary-purple); font-weight: 600; min-height: 20px; margin-top: 15px; }
+        .footer-message { font-size: 14px; color: var(--primary-purple); font-weight: 600; margin-top: 15px; }
     </style>
 </head>
 <body>
@@ -63,18 +45,13 @@
         <div class="body-content">
             <h3 id="course-header">...</h3>
             <p id="course-desc" style="font-size: 14px; margin-bottom: 20px;">...</p>
-            
-            <button class="btn-main" id="main-button" onclick="jumpToPlan2Learn()">
-                ...
-            </button>
-
+            <button class="btn-main" id="main-button" onclick="jumpToPlan2Learn()">...</button>
             <div class="quick-actions">
                 <button class="btn-sub" id="btn-signups" onclick="window.open('https://prooffice.plan2learn.dk/catalog/see-all/2?id=1ef2679d-ff86-4c0f-abab-ee2e0ce35655', '_blank')">📋 ...</button>
                 <button class="btn-sub" id="btn-favorites" onclick="window.open('https://prooffice.plan2learn.dk/catalog/lists/favorites?id=1ef2679d-ff86-4c0f-abab-ee2e0ce35655', '_blank')">⭐ ...</button>
             </div>
-
             <div style="margin-top:25px; border-top:1px solid var(--border-color); padding-top:20px;">
-                <span id="mood-header" style="font-size:11px; color: var(--text-sub); text-transform: uppercase; letter-spacing: 1px;">...</span>
+                <span id="mood-header" style="font-size:11px; color: var(--text-sub); text-transform: uppercase;">...</span>
                 <div class="mood-grid">
                     <button class="mood-btn" onclick="setMood(this, 'rocket')">🚀</button>
                     <button class="mood-btn" onclick="setMood(this, 'happy')">😊</button>
@@ -93,13 +70,10 @@
         function jumpToPlan2Learn() {
             const now = new Date();
             localStorage.setItem('p2l_last_click', now.toISOString());
-            const btn = document.getElementById('main-button');
-            const originalText = btn.innerText;
-            btn.innerText = isDanishLocale ? "Åbner..." : "Opening...";
-            
+            document.getElementById('main-button').innerText = isDanishLocale ? "Åbner..." : "Opening...";
             setTimeout(() => {
                 window.open('https://prooffice.plan2learn.dk/?id=1ef2679d-ff86-4c0f-abab-ee2e0ce35655', '_blank');
-                btn.innerText = originalText;
+                document.getElementById('main-button').innerText = isDanishLocale ? "Gå til Plan2Learn" : "Jump into Plan2Learn";
                 displayLastLogin(now);
             }, 600);
         }
@@ -107,37 +81,25 @@
         function displayLastLogin(dateObj) {
             if (!dateObj) return;
             document.getElementById('login-pill-box').style.display = 'inline-flex';
-            const timeString = dateObj.toLocaleDateString(isDanishLocale ? 'da-DK' : 'en-GB', { 
-                weekday: 'short', day: 'numeric', month: 'short' 
-            }) + (isDanishLocale ? ' kl. ' : ' at ') + dateObj.getHours() + ':' + (dateObj.getMinutes()<10?'0':'') + dateObj.getMinutes();
+            const timeString = dateObj.toLocaleDateString(isDanishLocale ? 'da-DK' : 'en-GB', { weekday: 'short', day: 'numeric', month: 'short' }) + (isDanishLocale ? ' kl. ' : ' at ') + dateObj.getHours() + ':' + (dateObj.getMinutes()<10?'0':'') + dateObj.getMinutes();
             document.getElementById('current-time').innerText = timeString;
         }
 
         async function initializeApp() {
             try {
                 await microsoftTeams.app.initialize();
-                
                 setTimeout(async () => {
                     const context = await microsoftTeams.app.getContext();
                     isDanishLocale = (context.app.locale || "en-us").toLowerCase().includes("da");
-                    
-                    if (context.app.theme === 'dark' || context.app.theme === 'contrast') {
-                        document.body.classList.add('dark');
-                    }
+                    if (context.app.theme === 'dark' || context.app.theme === 'contrast') document.body.classList.add('dark');
+
+                    // Name Logic
+                    let rawName = context.user.displayName || context.user.givenName || (context.user.userPrincipalName ? context.user.userPrincipalName.split('@')[0] : "User");
+                    const firstName = rawName.split(/[. ]/)[0]; // Splits by space or dot
+                    const cleanName = firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
 
                     const hour = new Date().getHours();
-                    let greetingBase = "";
-                    if (isDanishLocale) {
-                        if (hour < 10) greetingBase = "Godmorgen";
-                        else if (hour < 18) greetingBase = "Godt at se dig";
-                        else greetingBase = "Godaften";
-                    } else {
-                        if (hour < 12) greetingBase = "Good morning";
-                        else if (hour < 18) greetingBase = "Good afternoon";
-                        else greetingBase = "Good evening";
-                    }
-
-                    const firstName = (context.user.displayName || "User").split(' ')[0]; 
+                    let greetingBase = isDanishLocale ? (hour < 10 ? "Godmorgen" : hour < 18 ? "Godt at se dig" : "Godaften") : (hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening");
 
                     const translations = {
                         subtext: isDanishLocale ? "Klar til at lære noget nyt?" : "Ready to learn something new?",
@@ -157,7 +119,7 @@
                         sleepy: isDanishLocale ? "Kaffe først, så Plan2Learn! ☕" : "Coffee first, then Plan2Learn! ☕"
                     };
 
-                    document.getElementById('user-greeting').innerText = greetingBase + ", " + firstName + "!";
+                    document.getElementById('user-greeting').innerText = greetingBase + ", " + cleanName + "!";
                     document.getElementById('sub-header').innerText = translations.subtext;
                     document.getElementById('login-label').innerText = translations.login;
                     document.getElementById('course-header').innerText = translations.courseHeader;
@@ -170,8 +132,7 @@
 
                     const savedTime = localStorage.getItem('p2l_last_click');
                     if (savedTime) displayLastLogin(new Date(savedTime));
-
-                }, 150);
+                }, 200);
             } catch (err) { console.error(err); }
         }
 
