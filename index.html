@@ -25,76 +25,99 @@
 <body>
     <div class="card">
         <div class="header">
-            <h1 id="user-greeting">Good to see you!</h1>
-            <p>Ready to level up today?</p>
+            <h1 id="user-greeting">...</h1>
+            <p id="sub-header">...</p>
             <div class="login-pill">
                 <span class="dot"></span>
-                Last login: <span id="current-time"></span>
+                <span id="login-label"></span> <span id="current-time"></span>
             </div>
         </div>
         <div class="body-content">
-            <h3>Your courses are waiting for you (Updated!)</h3>
-            <p style="color: #6B7280; font-size: 14px;">Pick up where you left off — one click and you're back in the zone.</p>
-            <button class="btn-main" onclick="window.open('https://prooffice.plan2learn.dk/?id=1ef2679d-ff86-4c0f-abab-ee2e0ce35655', '_blank')">
-                Jump into Plan2Learn
+            <h3 id="course-header">...</h3>
+            <p id="course-desc" style="color: #6B7280; font-size: 14px;">...</p>
+            <button class="btn-main" id="main-button" onclick="window.open('https://prooffice.plan2learn.dk/?id=1ef2679d-ff86-4c0f-abab-ee2e0ce35655', '_blank')">
+                ...
             </button>
             <div style="margin-top:30px; border-top:1px solid #eee; padding-top:20px;">
-                <span style="font-size:12px; color:#9CA3AF;">How are you feeling today?</span>
+                <span id="mood-header" style="font-size:12px; color:#9CA3AF;">...</span>
                 <div class="mood-grid">
                     <button class="mood-btn" onclick="setMood(this, 'rocket')">🚀</button>
                     <button class="mood-btn" onclick="setMood(this, 'happy')">😊</button>
                     <button class="mood-btn" onclick="setMood(this, 'neutral')">😐</button>
                     <button class="mood-btn active" onclick="setMood(this, 'sleepy')">😴</button>
                 </div>
-                <div id="status-text" class="footer-message">Coffee first, then Plan2Learn 😂</div>
+                <div id="status-text" class="footer-message">...</div>
             </div>
         </div>
     </div>
 
     <script>
-        const messages = {
-            rocket: "Full speed ahead! Let's crush those courses! 🚀",
-            happy: "Great vibes! Perfect day for some learning. 😊",
-            neutral: "Let's turn that 'meh' into 'mastery' today. 😐",
-            sleepy: "Coffee first, then Plan2Learn 😂"
-        };
+        let currentMoodMessages = {};
 
-        function setMood(btn, moodKey) {
-            document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            document.getElementById('status-text').innerText = messages[moodKey];
-        }
-
-        // --- ENHANCED TEAMS IDENTITY LOGIC ---
         async function initializeApp() {
             try {
                 await microsoftTeams.app.initialize();
                 
-                // Tiny delay helps ensure the Teams context is fully populated
                 setTimeout(async () => {
                     const context = await microsoftTeams.app.getContext();
                     
-                    // Fallback chain: Display Name -> UPN username -> Default
-                    const userName = context.user.displayName || 
-                                     (context.user.userPrincipalName ? context.user.userPrincipalName.split('@')[0] : null) || 
-                                     "there";
-                    
-                    document.getElementById('user-greeting').innerText = "Good to see you, " + userName + "!";
+                    // --- 1. LANGUAGE DETECTION ---
+                    const locale = context.app.locale || "en-us";
+                    const isDanish = locale.toLowerCase().includes("da");
+
+                    // --- 2. FIRST NAME LOGIC ---
+                    const fullName = context.user.displayName || context.user.givenName || "User";
+                    const firstName = fullName.split(' ')[0]; 
+
+                    // --- 3. TRANSLATIONS ---
+                    const translations = {
+                        greeting: isDanish ? "Godt at se dig, " : "Good to see you, ",
+                        subtext: isDanish ? "Klar til at blive klogere i dag?" : "Ready to level up today?",
+                        login: isDanish ? "Sidste login: " : "Last login: ",
+                        courseHeader: isDanish ? "Dine kurser venter på dig" : "Your courses are waiting for you",
+                        courseDesc: isDanish ? "Fortsæt hvor du slap — ét klik og du er i gang igen." : "Pick up where you left off — one click and you're back in the zone.",
+                        button: isDanish ? "Gå til Plan2Learn" : "Jump into Plan2Learn",
+                        moodHeading: isDanish ? "Hvordan har du det i dag?" : "How are you feeling today?"
+                    };
+
+                    currentMoodMessages = {
+                        rocket: isDanish ? "Fuld fart frem! Lad os knuse de kurser! 🚀" : "Full speed ahead! Let's crush those courses! 🚀",
+                        happy: isDanish ? "Gode vibrationer! Perfekt dag til læring. 😊" : "Great vibes! Perfect day for some learning. 😊",
+                        neutral: isDanish ? "Lad os gøre 'meh' til mesterligt i dag. 😐" : "Let's turn that 'meh' into 'mastery' today. 😐",
+                        sleepy: isDanish ? "Kaffe først, så Plan2Learn 😂" : "Coffee first, then Plan2Learn 😂"
+                    };
+
+                    // --- 4. UPDATE UI ---
+                    document.getElementById('user-greeting').innerText = translations.greeting + firstName + "!";
+                    document.getElementById('sub-header').innerText = translations.subtext;
+                    document.getElementById('login-label').innerText = translations.login;
+                    document.getElementById('course-header').innerText = translations.courseHeader;
+                    document.getElementById('course-desc').innerText = translations.courseDesc;
+                    document.getElementById('main-button').innerText = translations.button;
+                    document.getElementById('mood-header').innerText = translations.moodHeading;
+                    document.getElementById('status-text').innerText = currentMoodMessages.sleepy;
+
+                    // Set dynamic time based on language
+                    const now = new Date();
+                    document.getElementById('current-time').innerText = now.toLocaleDateString(isDanish ? 'da-DK' : 'en-GB', { 
+                        weekday: 'long', day: 'numeric', month: 'long' 
+                    }) + ' kl. ' + now.getHours() + ':' + (now.getMinutes()<10?'0':'') + now.getMinutes();
+
                 }, 150);
             } catch (err) {
-                console.error("Teams SDK failed:", err);
+                console.error("Teams SDK error:", err);
             }
         }
 
-        // Only run if we are inside an iframe (Teams)
+        function setMood(btn, moodKey) {
+            document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('status-text').innerText = currentMoodMessages[moodKey];
+        }
+
         if (window.parent !== window.self) {
             initializeApp();
         }
-
-        const now = new Date();
-        document.getElementById('current-time').innerText = now.toLocaleDateString('en-GB', { 
-            weekday: 'long', day: 'numeric', month: 'long' 
-        }) + ' at ' + now.getHours() + ':' + (now.getMinutes()<10?'0':'') + now.getMinutes();
     </script>
 </body>
 </html>
