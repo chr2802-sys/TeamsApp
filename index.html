@@ -15,21 +15,20 @@
             --bg-color: #1F1F1F; --card-bg: #292929; --text-main: #FFFFFF;
             --text-sub: #ADADAD; --border-color: #3D3D3D; --pill-bg: rgba(0, 0, 0, 0.3);
         }
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; transition: 0.3s; }
-        .card { background: var(--card-bg); width: 500px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; text-align: center; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-color); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; transition: 0.3s; }
+        .card { background: var(--card-bg); width: 90%; max-width: 500px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; text-align: center; }
         .header { background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 100%); color: white; padding: 40px 20px; }
         .header h1 { margin: 0; font-size: 24px; }
         .login-pill { background: var(--pill-bg); border-radius: 50px; padding: 6px 16px; display: inline-flex; align-items: center; margin-top: 15px; font-size: 11px; }
         .dot { height: 8px; width: 8px; background: #4ADE80; border-radius: 50%; margin-right: 8px; }
-        .body-content { padding: 35px 30px; color: var(--text-main); }
-        .btn-main { background: var(--primary-purple); color: white; border: none; padding: 14px 45px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; width: 100%; }
-        .btn-main:hover { transform: translateY(-2px); background: var(--secondary-purple); }
+        .body-content { padding: 30px 25px; color: var(--text-main); }
+        .btn-main { background: var(--primary-purple); color: white; border: none; padding: 14px 20px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; width: 100%; }
         .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
         .btn-sub { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); padding: 10px; border-radius: 10px; font-size: 13px; cursor: pointer; font-weight: 600; }
         .mood-grid { display: flex; justify-content: center; gap: 10px; margin: 20px 0; }
         .mood-btn { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; width: 45px; height: 45px; cursor: pointer; font-size: 20px; color: var(--text-main); }
         .mood-btn.active { border-color: var(--primary-purple); background: rgba(75, 83, 188, 0.1); transform: scale(1.1); }
-        .footer-message { font-size: 14px; color: var(--primary-purple); font-weight: 600; margin-top: 15px; }
+        .footer-message { font-size: 14px; color: var(--primary-purple); font-weight: 600; margin-top: 15px; min-height: 20px; }
     </style>
 </head>
 <body>
@@ -88,19 +87,26 @@
         async function initializeApp() {
             try {
                 await microsoftTeams.app.initialize();
+                
+                // 400ms delay is safer for Mobile initialization
                 setTimeout(async () => {
                     const context = await microsoftTeams.app.getContext();
-                    isDanishLocale = (context.app.locale || "en-us").toLowerCase().includes("da");
+                    
+                    // --- MOBILE LANGUAGE FIX ---
+                    const locale = context.app.locale || context.app.preferredLanguage || navigator.language || "en-us";
+                    isDanishLocale = locale.toLowerCase().includes("da");
+
                     if (context.app.theme === 'dark' || context.app.theme === 'contrast') document.body.classList.add('dark');
 
-                    // Name Logic
+                    // --- NAME SCAN ---
                     let rawName = context.user.displayName || context.user.givenName || (context.user.userPrincipalName ? context.user.userPrincipalName.split('@')[0] : "User");
-                    const firstName = rawName.split(/[. ]/)[0]; // Splits by space or dot
+                    const firstName = rawName.split(/[. ]/)[0];
                     const cleanName = firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
 
                     const hour = new Date().getHours();
                     let greetingBase = isDanishLocale ? (hour < 10 ? "Godmorgen" : hour < 18 ? "Godt at se dig" : "Godaften") : (hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening");
 
+                    // --- UPDATE UI ---
                     const translations = {
                         subtext: isDanishLocale ? "Klar til at lære noget nyt?" : "Ready to learn something new?",
                         login: isDanishLocale ? "Sidst besøgt: " : "Last visit: ",
@@ -132,7 +138,7 @@
 
                     const savedTime = localStorage.getItem('p2l_last_click');
                     if (savedTime) displayLastLogin(new Date(savedTime));
-                }, 200);
+                }, 400); 
             } catch (err) { console.error(err); }
         }
 
