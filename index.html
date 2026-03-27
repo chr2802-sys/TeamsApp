@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>P2L Portal</title>
     <script src="https://res.cdn.office.net/teams-js/2.19.0/js/MicrosoftTeams.min.js"></script>
     <style>
@@ -15,18 +15,27 @@
             --bg-color: #1F1F1F; --card-bg: #292929; --text-main: #FFFFFF;
             --text-sub: #ADADAD; --border-color: #3D3D3D; --pill-bg: rgba(0, 0, 0, 0.3);
         }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-color); display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; transition: 0.3s; }
-        .card { background: var(--card-bg); width: 90%; max-width: 500px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; text-align: center; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg-color); display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; overflow-x: hidden; transition: 0.3s; }
+        
+        /* Mobile Full Screen Logic */
+        .card { background: var(--card-bg); width: 500px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; text-align: center; transition: 0.3s; }
+        
+        @media (max-width: 600px) {
+            body { align-items: flex-start; background-color: var(--card-bg); }
+            .card { width: 100%; height: 100vh; border-radius: 0; box-shadow: none; }
+            .header { padding: 60px 20px 40px 20px; } /* More space for mobile status bars */
+        }
+
         .header { background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 100%); color: white; padding: 40px 20px; }
         .header h1 { margin: 0; font-size: 24px; }
         .login-pill { background: var(--pill-bg); border-radius: 50px; padding: 6px 16px; display: inline-flex; align-items: center; margin-top: 15px; font-size: 11px; }
         .dot { height: 8px; width: 8px; background: #4ADE80; border-radius: 50%; margin-right: 8px; }
         .body-content { padding: 30px 25px; color: var(--text-main); }
-        .btn-main { background: var(--primary-purple); color: white; border: none; padding: 14px 20px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; width: 100%; }
+        .btn-main { background: var(--primary-purple); color: white; border: none; padding: 16px 20px; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.2s; width: 100%; -webkit-tap-highlight-color: transparent; }
         .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .btn-sub { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); padding: 10px; border-radius: 10px; font-size: 13px; cursor: pointer; font-weight: 600; }
+        .btn-sub { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); padding: 12px; border-radius: 10px; font-size: 13px; cursor: pointer; font-weight: 600; }
         .mood-grid { display: flex; justify-content: center; gap: 10px; margin: 20px 0; }
-        .mood-btn { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; width: 45px; height: 45px; cursor: pointer; font-size: 20px; color: var(--text-main); }
+        .mood-btn { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 10px; width: 50px; height: 50px; cursor: pointer; font-size: 22px; color: var(--text-main); }
         .mood-btn.active { border-color: var(--primary-purple); background: rgba(75, 83, 188, 0.1); transform: scale(1.1); }
         .footer-message { font-size: 14px; color: var(--primary-purple); font-weight: 600; margin-top: 15px; min-height: 20px; }
     </style>
@@ -34,30 +43,30 @@
 <body>
     <div class="card">
         <div class="header">
-            <h1 id="user-greeting">...</h1>
-            <p id="sub-header">...</p>
-            <div class="login-pill" id="login-pill-box" style="display: none;">
+            <h1 id="user-greeting">Welcome</h1>
+            <p id="sub-header">Loading Portal...</p>
+            <div class="login-pill" id="login-pill-box" style="visibility: hidden;">
                 <span class="dot"></span>
                 <span id="login-label"></span> <span id="current-time"></span>
             </div>
         </div>
         <div class="body-content">
-            <h3 id="course-header">...</h3>
-            <p id="course-desc" style="font-size: 14px; margin-bottom: 20px;">...</p>
-            <button class="btn-main" id="main-button" onclick="jumpToPlan2Learn()">...</button>
+            <h3 id="course-header">Accessing Courses</h3>
+            <p id="course-desc" style="font-size: 14px; margin-bottom: 20px;">Please wait while we set things up.</p>
+            <button class="btn-main" id="main-button" onclick="jumpToPlan2Learn()">Open Plan2Learn</button>
             <div class="quick-actions">
-                <button class="btn-sub" id="btn-signups" onclick="window.open('https://prooffice.plan2learn.dk/catalog/see-all/2?id=1ef2679d-ff86-4c0f-abab-ee2e0ce35655', '_blank')">📋 ...</button>
-                <button class="btn-sub" id="btn-favorites" onclick="window.open('https://prooffice.plan2learn.dk/catalog/lists/favorites?id=1ef2679d-ff86-4c0f-abab-ee2e0ce35655', '_blank')">⭐ ...</button>
+                <button class="btn-sub" id="btn-signups" onclick="window.open('https://prooffice.plan2learn.dk/catalog/see-all/2?id=1ef2679d-ff86-4c0f-abab-ee2e0ce35655', '_blank')">📋 Sign Ups</button>
+                <button class="btn-sub" id="btn-favorites" onclick="window.open('https://prooffice.plan2learn.dk/catalog/lists/favorites?id=1ef2679d-ff86-4c0f-abab-ee2e0ce35655', '_blank')">⭐ Favorites</button>
             </div>
             <div style="margin-top:25px; border-top:1px solid var(--border-color); padding-top:20px;">
-                <span id="mood-header" style="font-size:11px; color: var(--text-sub); text-transform: uppercase;">...</span>
+                <span id="mood-header" style="font-size:11px; color: var(--text-sub); text-transform: uppercase;">Energy Check</span>
                 <div class="mood-grid">
                     <button class="mood-btn" onclick="setMood(this, 'rocket')">🚀</button>
                     <button class="mood-btn" onclick="setMood(this, 'happy')">😊</button>
                     <button class="mood-btn" onclick="setMood(this, 'neutral')">😐</button>
                     <button class="mood-btn active" onclick="setMood(this, 'sleepy')">😴</button>
                 </div>
-                <div id="status-text" class="footer-message">...</div>
+                <div id="status-text" class="footer-message">Coffee first...</div>
             </div>
         </div>
     </div>
@@ -65,6 +74,7 @@
     <script>
         let currentMoodMessages = {};
         let isDanishLocale = false;
+        let appInitialized = false;
 
         function jumpToPlan2Learn() {
             const now = new Date();
@@ -72,74 +82,87 @@
             document.getElementById('main-button').innerText = isDanishLocale ? "Åbner..." : "Opening...";
             setTimeout(() => {
                 window.open('https://prooffice.plan2learn.dk/?id=1ef2679d-ff86-4c0f-abab-ee2e0ce35655', '_blank');
-                document.getElementById('main-button').innerText = isDanishLocale ? "Gå til Plan2Learn" : "Jump into Plan2Learn";
+                renderUI("User"); // Re-render to reset button text
                 displayLastLogin(now);
             }, 600);
         }
 
         function displayLastLogin(dateObj) {
             if (!dateObj) return;
-            document.getElementById('login-pill-box').style.display = 'inline-flex';
+            document.getElementById('login-pill-box').style.visibility = 'visible';
             const timeString = dateObj.toLocaleDateString(isDanishLocale ? 'da-DK' : 'en-GB', { weekday: 'short', day: 'numeric', month: 'short' }) + (isDanishLocale ? ' kl. ' : ' at ') + dateObj.getHours() + ':' + (dateObj.getMinutes()<10?'0':'') + dateObj.getMinutes();
             document.getElementById('current-time').innerText = timeString;
         }
 
+        function renderUI(nameInput) {
+            const hour = new Date().getHours();
+            const rawName = nameInput || "User";
+            const firstName = rawName.split(/[. ]/)[0];
+            const cleanName = firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+
+            let greetingBase = isDanishLocale ? 
+                (hour < 10 ? "Godmorgen" : hour < 18 ? "Godt at se dig" : "Godaften") : 
+                (hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening");
+
+            const translations = {
+                subtext: isDanishLocale ? "Klar til at lære noget nyt?" : "Ready to learn something new?",
+                login: isDanishLocale ? "Sidst besøgt: " : "Last visit: ",
+                courseHeader: isDanishLocale ? "Dine kurser" : "Your Courses",
+                courseDesc: isDanishLocale ? "Fortsæt din udvikling med ét klik." : "Continue your development with one click.",
+                button: isDanishLocale ? "Gå til Plan2Learn" : "Jump into Plan2Learn",
+                moodHeading: isDanishLocale ? "Hvordan er energien?" : "What's your energy level?",
+                signups: isDanishLocale ? "📋 Mine tilmeldinger" : "📋 My sign ups",
+                favorites: isDanishLocale ? "⭐ Mine favoritter" : "⭐ My favorites"
+            };
+
+            currentMoodMessages = {
+                rocket: isDanishLocale ? "Fuld fart frem! 🚀" : "Full speed ahead! 🚀",
+                happy: isDanishLocale ? "Fantastisk energi! 😊" : "Great energy! 😊",
+                neutral: isDanishLocale ? "Vi gør det til en god dag. 😐" : "Let's make it a great day. 😐",
+                sleepy: isDanishLocale ? "Kaffe først, så Plan2Learn! ☕" : "Coffee first, then Plan2Learn! ☕"
+            };
+
+            document.getElementById('user-greeting').innerText = greetingBase + ", " + cleanName + "!";
+            document.getElementById('sub-header').innerText = translations.subtext;
+            document.getElementById('login-label').innerText = translations.login;
+            document.getElementById('course-header').innerText = translations.courseHeader;
+            document.getElementById('course-desc').innerText = translations.courseDesc;
+            document.getElementById('main-button').innerText = translations.button;
+            document.getElementById('mood-header').innerText = translations.moodHeading;
+            document.getElementById('status-text').innerText = currentMoodMessages.sleepy;
+            document.getElementById('btn-signups').innerText = translations.signups;
+            document.getElementById('btn-favorites').innerText = translations.favorites;
+        }
+
+        // FAIL-SAFE: If Teams SDK takes too long, render with Browser settings
+        const failSafeTimeout = setTimeout(() => {
+            if (!appInitialized) {
+                console.log("Teams SDK slow - using fail-safe");
+                isDanishLocale = navigator.language.toLowerCase().includes("da");
+                renderUI("User");
+            }
+        }, 1500);
+
         async function initializeApp() {
             try {
                 await microsoftTeams.app.initialize();
-                
-                // 400ms delay is safer for Mobile initialization
-                setTimeout(async () => {
-                    const context = await microsoftTeams.app.getContext();
-                    
-                    // --- MOBILE LANGUAGE FIX ---
-                    const locale = context.app.locale || context.app.preferredLanguage || navigator.language || "en-us";
-                    isDanishLocale = locale.toLowerCase().includes("da");
+                const context = await microsoftTeams.app.getContext();
+                appInitialized = true;
+                clearTimeout(failSafeTimeout);
 
-                    if (context.app.theme === 'dark' || context.app.theme === 'contrast') document.body.classList.add('dark');
+                const locale = context.app.locale || context.app.preferredLanguage || navigator.language || "en-us";
+                isDanishLocale = locale.toLowerCase().includes("da");
 
-                    // --- NAME SCAN ---
-                    let rawName = context.user.displayName || context.user.givenName || (context.user.userPrincipalName ? context.user.userPrincipalName.split('@')[0] : "User");
-                    const firstName = rawName.split(/[. ]/)[0];
-                    const cleanName = firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+                if (context.app.theme === 'dark' || context.app.theme === 'contrast') document.body.classList.add('dark');
 
-                    const hour = new Date().getHours();
-                    let greetingBase = isDanishLocale ? (hour < 10 ? "Godmorgen" : hour < 18 ? "Godt at se dig" : "Godaften") : (hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening");
+                let rawName = context.user.displayName || context.user.givenName || (context.user.userPrincipalName ? context.user.userPrincipalName.split('@')[0] : "User");
+                renderUI(rawName);
 
-                    // --- UPDATE UI ---
-                    const translations = {
-                        subtext: isDanishLocale ? "Klar til at lære noget nyt?" : "Ready to learn something new?",
-                        login: isDanishLocale ? "Sidst besøgt: " : "Last visit: ",
-                        courseHeader: isDanishLocale ? "Dine kurser" : "Your Courses",
-                        courseDesc: isDanishLocale ? "Fortsæt din udvikling med ét klik." : "Continue your development with one click.",
-                        button: isDanishLocale ? "Gå til Plan2Learn" : "Jump into Plan2Learn",
-                        moodHeading: isDanishLocale ? "Hvordan er energien?" : "What's your energy level?",
-                        signups: isDanishLocale ? "📋 Mine tilmeldinger" : "📋 My sign ups",
-                        favorites: isDanishLocale ? "⭐ Mine favoritter" : "⭐ My favorites"
-                    };
-
-                    currentMoodMessages = {
-                        rocket: isDanishLocale ? "Fuld fart frem! 🚀" : "Full speed ahead! 🚀",
-                        happy: isDanishLocale ? "Fantastisk energi! 😊" : "Great energy! 😊",
-                        neutral: isDanishLocale ? "Vi gør det til en god dag. 😐" : "Let's make it a great day. 😐",
-                        sleepy: isDanishLocale ? "Kaffe først, så Plan2Learn! ☕" : "Coffee first, then Plan2Learn! ☕"
-                    };
-
-                    document.getElementById('user-greeting').innerText = greetingBase + ", " + cleanName + "!";
-                    document.getElementById('sub-header').innerText = translations.subtext;
-                    document.getElementById('login-label').innerText = translations.login;
-                    document.getElementById('course-header').innerText = translations.courseHeader;
-                    document.getElementById('course-desc').innerText = translations.courseDesc;
-                    document.getElementById('main-button').innerText = translations.button;
-                    document.getElementById('mood-header').innerText = translations.moodHeading;
-                    document.getElementById('status-text').innerText = currentMoodMessages.sleepy;
-                    document.getElementById('btn-signups').innerText = translations.signups;
-                    document.getElementById('btn-favorites').innerText = translations.favorites;
-
-                    const savedTime = localStorage.getItem('p2l_last_click');
-                    if (savedTime) displayLastLogin(new Date(savedTime));
-                }, 400); 
-            } catch (err) { console.error(err); }
+                const savedTime = localStorage.getItem('p2l_last_click');
+                if (savedTime) displayLastLogin(new Date(savedTime));
+            } catch (err) {
+                console.error("Teams Init Error:", err);
+            }
         }
 
         function setMood(btn, moodKey) {
